@@ -1,17 +1,27 @@
 import express from "express";
-import { createBook, getBooks, getBookById, updateBook, deleteBook, getArrival} from "../controller/bookController.js";
-
+import {
+  createBook,
+  getBooks,
+  getBookById,
+  updateBook,
+  deleteBook,
+  getArrival,
+  searchBook,
+} from "../controller/bookController.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
-// CRUD routes
-router.post("/", createBook);       // Create book
-router.get("/", getBooks);          // Get all books
-router.get("/arrival", getArrival);
-router.get("/:id", getBookById);    // Get single book
-router.put("/:id", updateBook);     // Update book
-router.delete("/:id", deleteBook);  // Delete book
+// Create book with image upload
+router.post("/", upload.single("image"), createBook);
+router.get("/search", searchBook);
+// Update book with optional new image
+router.put("/:id", upload.single("image"), updateBook);
 
+router.get("/", getBooks);
+router.get("/arrival", getArrival);
+router.get("/:id", getBookById);
+router.delete("/:id", deleteBook);
 
 
 export default router;

@@ -1,7 +1,15 @@
+import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 
-// Register user (signup)
+// ================== JWT Helper ==================
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
+
+// ================== REGISTER ==================
 export const register = async (req, res) => {
   try {
     const { email, password, username, address, contact } = req.body;
@@ -12,23 +20,21 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Generate salt & hash password
-    const salt = await bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-
-    // Save new user with hashed password
+    // ❌ no manual hashing (use schema pre-save hook OR hash here if needed)
     const newUser = new User({
       email,
-      password: hashedPassword,
+      password,
       username,
       address,
       contact,
     });
 
     await newUser.save();
+    console.log("Saved user:", newUser);
 
     res.status(201).json({
       message: "User registered successfully",
+      token: generateToken(newUser._id), // ✅ return token
       user: {
         id: newUser._id,
         email: newUser.email,
@@ -40,29 +46,33 @@ export const register = async (req, res) => {
   }
 };
 
-// Login user
+// ================== LOGIN ==================
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Login attempt:", email);
 
     // Find user by email
     const user = await User.findOne({ email });
-    console.log(user);
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
     // Compare plain password with hashed one
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(isMatch);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // JWT later, this is where you'd generate it
+    // ✅ Success
     res.status(200).json({
       message: "Login successful",
-      user: { id: user._id, email: user.email, username: user.username },
+      token: generateToken(user._id), // ✅ return token
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
