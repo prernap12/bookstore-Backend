@@ -7,4 +7,6 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 
+const multer = require('multer');
+
 export default router;

@@ -101,6 +101,8 @@ export const searchBook = async (req, res) => {
     console.log("Hiii");
     const {book} = req.query
     console.log(book); 
+
+    
     const searchbook  = await Book.find({
       $or: [
         { name: { $regex: book, $options: 'i' } },

@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 });
 
 
-// file filter (only images)
+// file filter (only i  mages)
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif/;
   const extname = allowedTypes.test(
