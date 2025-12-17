@@ -1,4 +1,7 @@
-import Book from "../models/bookModel.js";
+import Book from "../models/bookModel.js"; 
+import { uploadOnCloudinary } from "../helpers/uploads.js";
+import fs from 'fs';
+import { url } from "inspector";
 
 // Create a new book
 export const createBook = async (req, res) => {
@@ -6,7 +9,12 @@ export const createBook = async (req, res) => {
     const { name, author, price, discount, description } = req.body;
 
     // Multer adds file info in req.file
-    const image = req.file ? req.file.filename : null;
+    const image = req.file ? req.file.path : null;
+    console.log(image);
+
+ const imageUrl=  await uploadOnCloudinary(image);
+
+
 
     const book = new Book({
       name,
@@ -14,11 +22,16 @@ export const createBook = async (req, res) => {
       price,
       discount,
       description,
-      image, // store file name in DB
+      image:imageUrl.secure_url, // store file name in DB
     });
 
     await book.save();
     res.status(201).json(book);
+    // Source - https://stackoverflow.com/a
+// Posted by sourcecode, modified by community. See post 'Timeline' for change history
+// Retrieved 2025-12-17, License - CC BY-SA 3.0
+fs.unlinkSync(image);
+
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -39,7 +52,13 @@ export const updateBook = async (req, res) => {
 
     // If a new image is uploaded, replace the old one
     if (req.file) {
-      updateData.image = req.file.filename;
+    const imagePath= req.file.path
+      
+      const URL= await uploadOnCloudinary(imagePath);
+       updateData.image= URL.secure_url
+      console.log(updateData.image);
+      fs.unlinkSync(imagePath);
+
     }
 
     const book = await Book.findByIdAndUpdate(req.params.id, updateData, { new: true });

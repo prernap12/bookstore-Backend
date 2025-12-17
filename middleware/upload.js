@@ -12,6 +12,7 @@ const storage = multer.diskStorage({
       Date.now() + path.extname(file.originalname) // e.g. 1695234234.jpg
     );
   },
+
 });
 
 
@@ -30,4 +31,4 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-export const upload = multer({ storage, fileFilter });
+export const upload = multer({ storage });
