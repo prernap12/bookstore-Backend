@@ -1,7 +1,11 @@
 // routes/cartRoutes.js
 import express from "express";
-import { addToCart, getCart, removeFromCart } from "../controller/cartController.js";
-import { protect } from "../middleware/protect.js"; // make sure user is logged in
+import {
+  addToCart,
+  getCart,
+  removeFromCart,
+} from "../controller/cartController.js";
+import { protect } from "../middleware/auth.middleware.js"; // make sure user is logged in
 
 const router = express.Router();
 
