@@ -19,6 +19,7 @@ app.use(cors({ origin: "http://localhost:3000" }));
 
 // Serve static folder for images
 // app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 // Routes
 app.use("/api/books", bookRoutes);
 app.use("/api/user", userRoutes);

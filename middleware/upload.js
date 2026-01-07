@@ -1,24 +1,5 @@
-import multer from "multer";
-import path from "path";
-
-// storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // save files inside /uploads
-  },
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      Date.now() + path.extname(file.originalname) // e.g. 1695234234.jpg
-    );
-  },
-
-});
-
-
-// file filter (only i  mages)
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif/;
+  const allowedTypes = /jpeg|jpg|png|/;
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );
@@ -31,4 +12,38 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-export const upload = multer({ storage });
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { v4 as uuid4 } from "uuid";
+import { fileURLToPath } from "url";
+
+// recreate __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// storage config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, "../upload");
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    cb(null, dir);
+  },
+
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${uuid4()}${ext}`);
+  },
+});
+
+export const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
