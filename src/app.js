@@ -14,7 +14,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 // 👆 allows requests from your React app
 
 // Serve static folder for images

@@ -71,7 +71,7 @@ export const updateBook = async (req, res) => {
 
 export const getArrival = async (req, res) => {
   try {
-    const arrival = await Book.find().sort({ createdAt: -1 }).limit(2);
+    const arrival = await Book.find().sort({ createdAt: -1 }).limit(6);
     res.status(201).json(arrival);
   } catch (err) {
     res.status(400).json({ error: err.message });
