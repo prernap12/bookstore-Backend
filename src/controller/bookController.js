@@ -1,25 +1,24 @@
 import Book from "../models/bookModel.js";
 import { uploadOnCloudinary } from "../helpers/uploads.js";
 import fs from "fs";
-import { url } from "inspector";
 
 // Create a new book
 export const createBook = async (req, res) => {
   try {
     const { name, author, price, discount, description } = req.body;
-    console.log(req.body);
 
     // Multer adds file info in req.file
     const image = req.file ? req.file.path : null;
-    console.log(image);
 
     const imageUrl = await uploadOnCloudinary(image);
+
+    const discountValue = parseFloat(discount);
 
     const book = new Book({
       name,
       author,
       price,
-      discount,
+      discount: discountValue,
       description,
       image: imageUrl.secure_url, // store file name in DB
     });

@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 // storage config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, "../upload");
+    const dir = path.join(__dirname, "../../upload");
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
