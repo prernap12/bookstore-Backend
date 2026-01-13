@@ -6,7 +6,7 @@ import bookRoutes from "./routes/bookRoute.js";
 import userRoutes from "./routes/userRoute.js";
 import authRoutes from "./routes/authRoute.js";
 import contactRoutes from "./routes/contactRoute.js";
-import path from "path";
+
 import cartRoute from "./routes/cartRoute.js";
 
 dotenv.config();

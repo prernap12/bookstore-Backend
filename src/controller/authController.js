@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import { UserRegister } from "../dto/userRegister.dto.js";
 
 // ================== JWT Helper ==================
 const generateToken = (id) => {
@@ -12,21 +13,24 @@ const generateToken = (id) => {
 // ================== REGISTER ==================
 export const register = async (req, res) => {
   try {
-    const { email, password, username, address, contact } = req.body;
+    const data = UserRegister.safeParse(req.body);
 
+    if (!data.success) {
+      return res.status(403).json({ success: false, error: data.error.issues });
+    }
     // Check if email already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: data.data.email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
     // ❌ no manual hashing (use schema pre-save hook OR hash here if needed)
     const newUser = new User({
-      email,
-      password,
-      username,
-      address,
-      contact,
+      email: data.data.email,
+      password: data.data.password,
+      username: data.data.username,
+      address: data.data.address,
+      contact: data.data.contact,
     });
 
     // console.log("Saved user:", newUser);
@@ -39,6 +43,8 @@ export const register = async (req, res) => {
       data: userWithoutPassword,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
