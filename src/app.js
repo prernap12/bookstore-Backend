@@ -27,6 +27,4 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/addtocart", cartRoute);
 
-// DB connection
-
 export default app;

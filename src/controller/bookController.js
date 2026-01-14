@@ -2,24 +2,34 @@ import Book from "../models/bookModel.js";
 import { uploadOnCloudinary } from "../helpers/uploads.js";
 import fs from "fs";
 
+import { BookRegister, UpdateBook } from "../dto/book.dto.js";
+import mongoose from "mongoose";
+import { da } from "zod/locales";
+
 // Create a new book
 export const createBook = async (req, res) => {
   try {
-    const { name, author, price, discount, description } = req.body;
+    // const { name, author, price, discount, description } = req.body;
+
+    const data = BookRegister.safeParse(req.body);
+
+    if (!data.success) {
+      return res.status(402).json({ success: false, error: data.error.issues });
+    }
 
     // Multer adds file info in req.file
     const image = req.file ? req.file.path : null;
 
     const imageUrl = await uploadOnCloudinary(image);
 
-    const discountValue = parseFloat(discount);
+    const discountValue = parseFloat(data.data.discount);
 
     const book = new Book({
-      name,
-      author,
-      price,
+      name: data.data.name,
+      author: data.data.author,
+      price: data.data.price,
       discount: discountValue,
-      description,
+      description: data.data.description,
       image: imageUrl.secure_url, // store file name in DB
     });
 
@@ -37,14 +47,23 @@ export const createBook = async (req, res) => {
 // Update a book
 export const updateBook = async (req, res) => {
   try {
-    const { name, author, price, discount, description } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+      return res.status(404).json({
+        success: false,
+        error: "invalid book id ",
+      });
+    // const { name, author, price, discount, description } = req.body;
+
+    const data = UpdateBook.safeParse(req.body);
+    if (!data.success)
+      return res.status(404).json({ success: false, error: data.error.issues });
 
     const updateData = {
-      name,
-      author,
-      price,
-      discount,
-      description,
+      name: data.data.name,
+      author: data.data.author,
+      price: data.data.price,
+      discount: data.data.discount,
+      description: data.data.description,
     };
 
     // If a new image is uploaded, replace the old one
